@@ -1,5 +1,5 @@
-// assign1011.cpp : Defines the entry point for the console application.
-//
+// surreyturtle.cpp : Defines the entry point for the console application.
+
 
 #include "window.h"
 
