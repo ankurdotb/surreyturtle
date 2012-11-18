@@ -5,14 +5,14 @@
 
 void draw(void)   
 {
-	glBegin(GL_LINE_LOOP);								// Draw the 3 connected verticies of a triangle
+	/*glBegin(GL_LINE_LOOP);								// Draw the 3 connected verticies of a triangle
 		glVertex3f( 0.0f, 1.0f, 0.0f);					// Top
 		glVertex3f(-1.0f,-1.0f, 0.0f);					// Bottom Left
 		glVertex3f( 1.0f,-1.0f, 0.0f);					// Bottom Right
 	glEnd();											// Finished Drawing The Triangle
 
-	glTranslatef(-2.5f,0.0f,0.0f);						// Move Left 1.5 Units
-	glRotatef(20,0,0,1);								// Rotate by 20 degrees
+	//glTranslatef(-2.5f,0.0f,0.0f);						// Move Left 1.5 Units
+	glRotatef(45,0,0,1);								// Rotate by 20 degrees
 	glBegin(GL_LINE_LOOP);								// Draw the triangle again
 		glVertex3f( 0.0f, 1.0f, 0.0f);
 		glVertex3f(-1.0f,-1.0f, 0.0f);
@@ -26,7 +26,16 @@ void draw(void)
 		glVertex3f( 1.0f, 1.0f, 0.0f);					// Top Right
 		glVertex3f( 1.0f,-1.0f, 0.0f);					// Bottom Right
 		glVertex3f(-1.0f,-1.0f, 0.0f);					// Bottom Left
-	glEnd();
+	glEnd();*/
+	
+	for (int i = 0; i < 10; i++)
+	{
+	glBegin(GL_LINES);
+		glRotatef(10,0,0,1);
+		glTranslatef(0.0f, i*0.5f, 0.0f);
+		glVertex3f(0.0f, 0.50f, 0.0f);
+	glEnd();  
+	}                   
 }
 
 int main ( int argc, char** argv )   // Create Main Function For Bringing It All Together
