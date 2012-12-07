@@ -1,7 +1,14 @@
-// shape.cpp : Defines the entry point for the console application.
+/******************************************************************************
+  
+  main.cpp
+  
+  Entry point for application. Accepts command line arguments from the terminal
+  and spawns a window to display the output.
+  
+******************************************************************************/
 
 
-#include "window.h"
+// Standard C++ libaries
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -10,63 +17,17 @@
 #include <cstdio>
 #include <cstdlib>
 
+// Custom include files
+#include "window.h"
+#include "Prog.h"
+#include "Command.h"
+
 
 using namespace std;
-
-
-class node
-{
-	virtual node() {};
-	virtual ~node() {};
-	virtual void run()=0;
-};
-
-
-class Prog
-{
-	vector<node*> listing;
-	Prog();
-	~Prog();
-	void run();
-	friend std::istream& operator>> (std::istream& in, command& a);
-};
-
-
-class command : public node
-{
-	float v;
-	command();
-	~command();
-	friend std::istream& operator>> (std::istream& in, command& a);
-};
-
-
-class forward : public command
-{
-	void run();
-};
-
-
-class jump : public command
-{
-
-	void run();
-};
-
-
-class rotate : public command
-{
-	void run();
-};
-
-
-class repeat : public command
-{
-	Prog pg;
-};
-
-
 Prog p;
+
+
+// Hook that window.h calls to start excution of the program
 void draw()
 {
 	p.run();
