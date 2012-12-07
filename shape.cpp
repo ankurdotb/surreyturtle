@@ -14,97 +14,63 @@
 using namespace std;
 
 
-class commands
+class node
 {
-	private:
-		double x, y, z;
-		void line(int);
-		void rotate(int);
-		void translate(int);
-	protected:
-		
-	public:
-		commands();
-		~commands();		
+	virtual node() {};
+	virtual ~node() {};
+	virtual void run()=0;
 };
 
 
-class instructions : public commands
+class Prog
 {
-	private:
-		static vector<string> instructionTokens;
-	protected:
-	public:
-		instructions();
-		~instructions();
-		void readFile(char *);
-		void run();
+	vector<node*> listing;
+	Prog();
+	~Prog();
+	void run();
+	friend std::istream& operator>> (std::istream& in, command& a);
 };
 
 
-
-commands::commands() { } // Constructor for commands class
-
-commands::~commands() { } // Destructor for commands class
-
-void commands::line(int value) { } // Draw straight lines
-
-void commands::rotate(int value) { } // Rotate pointer
-
-void commands::translate(int value) { } // Translate pointer without drawing anything
-
-instructions::instructions() { } // Constructor for instructions class
-
-instructions::~instructions() { } // Destructor for instructions class
-
-
-void instructions::readFile(char *fileName)
+class command : public node
 {
-	string line, buf; // Temporary variables for processing instructions file
-	ifstream instructionsFile;
-	instructionsFile.open(fileName);
-	if (instructionsFile.is_open())
-	{
-		while(instructionsFile.good())
-		{
-			getline(instructionsFile,line);
-			stringstream ss(line);
-			while(ss>>buf)
-			this->instructionTokens.push_back(buf);
-		}
-		instructionsFile.close();
-	}
-}
+	float v;
+	command();
+	~command();
+	friend std::istream& operator>> (std::istream& in, command& a);
+};
 
 
-void instructions::run()
+class forward : public command
 {
-	commands commandSet;
-	string temp;
-	for ( int index = 0; index < this->instructionTokens.size(); index += 2)
-	{
-		if(this->instructionTokens[index] == "FORWARD")
-		{
-			temp = this->instructionTokens[index+1];
-			//commandSet.line(temp);		
-		}
-
-		if(this->instructionTokens[index] == "LEFT"){
-			temp = this->instructionTokens[index+1];
-			//commandSet.rotate(temp);	
-		}	
-	}
-}
+	void run();
+};
 
 
-instructions instructionSet;
-
-
-void draw(void)   
+class jump : public command
 {
-	instructionSet.run();
-}
 
+	void run();
+};
+
+
+class rotate : public command
+{
+	void run();
+};
+
+
+class repeat : public command
+{
+	Prog pg;
+};
+
+
+Prog p;
+void draw()
+{
+	p.run();
+}
 
 
 int main (int argc, char** argv)   // Main function for program
@@ -115,8 +81,9 @@ int main (int argc, char** argv)   // Main function for program
     		exit(0) ; 
  	}
  	
- 	instructionSet.readFile(argv[1]);
- 	
+ 	ifstream in(argv[1]);
+ 	in>>p;
+ 	in.close();
 	window w(argc,argv);
 	
 	return 0;
