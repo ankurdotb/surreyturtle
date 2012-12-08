@@ -11,11 +11,12 @@
 // Standard C++ libaries
 #include <iostream>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <sstream>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <tr1/regex>
 
 // Custom include files
 #include "Prog.h"

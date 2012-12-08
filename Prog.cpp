@@ -15,7 +15,7 @@ Prog::Prog() { }
 
 Prog::Prog(ifstream &infile)
 {
-	input = readFile(infile);
+	readFile(infile);
 }
 
 
@@ -29,17 +29,15 @@ istream& operator>> (ifstream &in, Prog &p)
 }
 
 
-string Prog::readFile(ifstream &infile)
+void Prog::readFile(ifstream &infile)
 {
-	string line;
-	if (infile.is_open())
+	if(infile.is_open())
 	{
-		while(instructionsFile.good())
-		{
-			getline(infile, line);
-		}
+		infile.seekg(0, ios::end);
+    		input.resize(infile.tellg());
+    		infile.seekg(0, ios::beg);
+    		infile.read(&input[0], input.size());
 	}
-	return line;
 }
 
 void Prog::createInstructionList(string &input)

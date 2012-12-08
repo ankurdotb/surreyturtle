@@ -11,11 +11,14 @@
 // Standard C++ libaries
 #include <iostream>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <sstream>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <tr1/regex>
+
 
 // Custom include files
 #include "window.h"
@@ -42,7 +45,7 @@ int main (int argc, char** argv)   // Main function for program
     		exit(0) ; 
  	}
  	
- 	ifstream in(argv[1]);
+ 	ifstream in(argv[1], ios::binary);
  	in>>p;
  	in.close();
 	window w(argc,argv);

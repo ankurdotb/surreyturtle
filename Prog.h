@@ -12,11 +12,13 @@
 // Standard C++ libaries
 #include <iostream>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <sstream>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <tr1/regex>
 
 // Custom include files
 #include "Command.h"
@@ -36,17 +38,17 @@ class Prog
 	private:
 		static vector<Node*> instructions;
 		static string input;
-		string readFile(ifstream &infile);
-		void createInstructionList(string &input);
+		void readFile(ifstream&);
+		void createInstructionList(string&);
 	public:
 		
 		
 		Prog();
-		Prog(ifstream &infile);
+		Prog(ifstream&);
 		
 		~Prog();
 		
-		friend istream& operator>> (ifstream &in, Prog &p);
+		friend istream& operator>> (ifstream&, Prog&);
 		
 		void run();
 };
