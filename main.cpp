@@ -17,7 +17,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <tr1/regex>
+#include <algorithm>
 
 
 // Custom include files
@@ -46,7 +46,7 @@ int main (int argc, char** argv)   // Main function for program
  	}
  	
  	ifstream in(argv[1], ios::binary);
- 	in>>p;
+ 	in >> p;
  	in.close();
 	window w(argc,argv);
 	

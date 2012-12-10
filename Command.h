@@ -15,8 +15,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <sstream>
 #include <vector>
-#include <tr1/regex>
+#include <algorithm>
 
 // Custom include files
 #include "Prog.h"

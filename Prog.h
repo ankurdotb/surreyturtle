@@ -18,7 +18,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <tr1/regex>
+#include <algorithm>
 
 // Custom include files
 #include "Command.h"
@@ -36,15 +36,18 @@ class Node
 class Prog
 {
 	private:
-		static vector<Node*> instructions;
-		static string input;
-		void readFile(ifstream&);
-		void createInstructionList(string&);
-	public:
+		vector<Command*> instructions;
+		string input;
 		
+		inline string StringToUpper(string);
 		
+		void readFile (ifstream&);
+		void createInstructionList (string&);
+		float getCommandValue(string);
+		
+	public:		
 		Prog();
-		Prog(ifstream&);
+		Prog (ifstream&);
 		
 		~Prog();
 		
