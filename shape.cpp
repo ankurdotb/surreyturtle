@@ -30,8 +30,26 @@ using namespace std;
 class Node
 {
 	protected:
-		virtual Node() {};
-		virtual ~Node() {};
+		float value;
+	public:
+		//virtual Node() {};
+		//virtual ~Node() {};
+		virtual void run() = 0;
+};
+
+
+class Command : public Node
+{
+	protected:
+		float value;
+	public:
+		Command();
+		Command(float);
+		
+		~Command();
+		
+		//friend istream& operator>> (istream& in, Command &c);
+		
 		virtual void run() = 0;
 };
 
@@ -57,22 +75,6 @@ class Prog
 		friend istream& operator>> (ifstream&, Prog&);
 		
 		void run();
-};
-
-
-class Command : public Node
-{
-	protected:
-		float value;
-	public:
-		Command();
-		Command(float);
-		
-		~Command();
-		
-		//friend istream& operator>> (istream& in, Command &c);
-		
-		virtual void run() = 0;
 };
 
 
@@ -182,7 +184,7 @@ float Prog::getCommandValue(string word2)
 	float v = 0;
 	
 	if (word2.find("]") == string::npos)
-		v = atof(word.c_str());
+		v = atof(word2.c_str());
 	else
 	{
 		word2 = word2.substr(0,word2.size()-1);
@@ -211,6 +213,7 @@ void Prog::createInstructionList(string &input)
 			v = getCommandValue(word);
 			tempCommand = new Forward(v);
 			instructions.push_back(tempCommand);
+			cout << "Setting FORWARD value to " << v << endl;
 		}
 		else if (word.find("LEFT") != string::npos)
 		{
@@ -218,6 +221,7 @@ void Prog::createInstructionList(string &input)
 			v = getCommandValue(word);
 			tempCommand = new Rotate(v);
 			instructions.push_back(tempCommand);
+			cout << "Setting ROTATE value to " << v << endl;
 		}
 		else if (word.find("RIGHT") != string::npos)
 		{
@@ -225,6 +229,7 @@ void Prog::createInstructionList(string &input)
 			v = -1 * getCommandValue(word);
 			tempCommand = new Rotate(v);
 			instructions.push_back(tempCommand);
+			cout << "Setting ROTATE value to " << v << endl;
 		}
 		else if (word.find("JUMP") != string::npos)
 		{
@@ -232,6 +237,7 @@ void Prog::createInstructionList(string &input)
 			v = getCommandValue(word);
 			tempCommand = new Jump(v);
 			instructions.push_back(tempCommand);
+			cout << "Setting JUMP value to " << v << endl;
 		}
 		/*else if (word.find("REPEAT") != string::npos)
 		{
@@ -287,6 +293,7 @@ void Forward::run()
 	
 	// Shift required line to desired location
 	glTranslatef(value, 0.0f, 0.0f);
+	cout << "Forward: " << value << endl;
 }
 
 
@@ -302,6 +309,7 @@ Jump::~Jump() { }
 void Jump::run()
 {
 	// Jump to desired location
+	cout << "Jump: " << value << endl;
 	glTranslatef(value, 0.0f, 0.0f);
 }
 
@@ -319,6 +327,7 @@ void Rotate::run()
 	// Rotate around Z-axis by desired value. Left / right rotation is
 	// handled by adding positive / negative sign while parsing input file
 	// in Prog::createInstructionList()
+	cout << "Rotate: " << value << endl;
 	glRotatef(value, 0, 0, 1);
 }
 
@@ -343,7 +352,7 @@ int main (int argc, char** argv)   // Main function for program
  	ifstream in(argv[1], ios::binary);
  	in >> p;
  	in.close();
-	window w(argc,argv);
+	//window w(argc,argv);
 	
 	return 0;
 }
