@@ -29,9 +29,9 @@ using namespace std;
 
 class Node
 {
+	/*protected:
+		float value;*/
 	protected:
-		float value;
-	public:
 		//virtual Node() {};
 		//virtual ~Node() {};
 		virtual void run() = 0;
@@ -48,8 +48,6 @@ class Command : public Node
 		
 		~Command();
 		
-		//friend istream& operator>> (istream& in, Command &c);
-		
 		virtual void run() = 0;
 };
 
@@ -58,12 +56,10 @@ class Prog
 {
 	private:
 		vector<Command*> instructions;
-		string input;
-		
+			
 		inline string StringToUpper(string);
 		
-		void readFile (ifstream&);
-		void createInstructionList (string&);
+		void createInstructionList(ifstream&);
 		float getCommandValue(string);
 		
 	public:		
@@ -133,7 +129,7 @@ Prog::Prog() { }
 
 Prog::Prog (ifstream &infile)
 {
-	readFile(infile);
+	createInstructionList(infile);
 }
 
 
@@ -146,7 +142,7 @@ Prog::~Prog()
 
 istream& operator>> (ifstream &in, Prog &p)
 {
-       p.readFile(in);
+       p.createInstructionList(in);
        return in;
 }
 
@@ -157,18 +153,6 @@ void Prog::run()
     {
         (*it)->run();
     }
-}
-
-
-void Prog::readFile (ifstream &infile)
-{
-	if(infile.is_open())
-	{
-		infile.seekg(0, ios::end);
-    		input.resize(infile.tellg());
-    		infile.seekg(0, ios::beg);
-    		infile.read(&input[0], input.size());
-	}
 }
 
 
@@ -193,16 +177,25 @@ float Prog::getCommandValue(string word2)
 	return v;
 }
 
-void Prog::createInstructionList(string &input)
+void Prog::createInstructionList(ifstream &infile)
 {
+	string input;
+	if(infile.is_open())
+	{
+		infile.seekg(0, ios::end);
+    		input.resize(infile.tellg());
+    		infile.seekg(0, ios::beg);
+    		infile.read(&input[0], input.size());
+	}
 	istringstream ss(input);
 	string word, word2;
 	float v = 0;
 	Command* tempCommand;
-	
+
 	while (ss >> word)
 	{
-		word = StringToUpper(word); // Command name can be in any case, converting to upper
+		// Command name can be in any case, converting to upper
+		word = StringToUpper(word); 
 		if (word == "[")
 		{
 			// Do nothing, discard and iterate to next word
@@ -213,7 +206,6 @@ void Prog::createInstructionList(string &input)
 			v = getCommandValue(word);
 			tempCommand = new Forward(v);
 			instructions.push_back(tempCommand);
-			cout << "Setting FORWARD value to " << v << endl;
 		}
 		else if (word.find("LEFT") != string::npos)
 		{
@@ -221,7 +213,6 @@ void Prog::createInstructionList(string &input)
 			v = getCommandValue(word);
 			tempCommand = new Rotate(v);
 			instructions.push_back(tempCommand);
-			cout << "Setting ROTATE value to " << v << endl;
 		}
 		else if (word.find("RIGHT") != string::npos)
 		{
@@ -229,7 +220,6 @@ void Prog::createInstructionList(string &input)
 			v = -1 * getCommandValue(word);
 			tempCommand = new Rotate(v);
 			instructions.push_back(tempCommand);
-			cout << "Setting ROTATE value to " << v << endl;
 		}
 		else if (word.find("JUMP") != string::npos)
 		{
@@ -237,7 +227,6 @@ void Prog::createInstructionList(string &input)
 			v = getCommandValue(word);
 			tempCommand = new Jump(v);
 			instructions.push_back(tempCommand);
-			cout << "Setting JUMP value to " << v << endl;
 		}
 		/*else if (word.find("REPEAT") != string::npos)
 		{
@@ -293,7 +282,6 @@ void Forward::run()
 	
 	// Shift required line to desired location
 	glTranslatef(value, 0.0f, 0.0f);
-	cout << "Forward: " << value << endl;
 }
 
 
@@ -309,7 +297,6 @@ Jump::~Jump() { }
 void Jump::run()
 {
 	// Jump to desired location
-	cout << "Jump: " << value << endl;
 	glTranslatef(value, 0.0f, 0.0f);
 }
 
@@ -327,7 +314,6 @@ void Rotate::run()
 	// Rotate around Z-axis by desired value. Left / right rotation is
 	// handled by adding positive / negative sign while parsing input file
 	// in Prog::createInstructionList()
-	cout << "Rotate: " << value << endl;
 	glRotatef(value, 0, 0, 1);
 }
 
@@ -352,7 +338,7 @@ int main (int argc, char** argv)   // Main function for program
  	ifstream in(argv[1], ios::binary);
  	in >> p;
  	in.close();
-	//window w(argc,argv);
+	window w(argc,argv);
 	
 	return 0;
 }
