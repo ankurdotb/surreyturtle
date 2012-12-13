@@ -19,6 +19,7 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
+#include <exception>
 
 
 // Custom include files
@@ -31,8 +32,6 @@ using namespace std;
 class Node
 {
 	protected:
-		//virtual Node() {};
-		//virtual ~Node() {};
 		virtual void run() = 0;
 };
 
@@ -56,12 +55,10 @@ class Prog
 {
 	private:
 		vector<Command*> instructions;
-		//string input;
-		streampos sspos = ios::beg;
+		streampos sspos;
 			
 		inline string StringToUpper (string);
 		
-		//string readFile();
 		void createInstructionList (ifstream&);
 		float getCommandValue (string);
 		
@@ -73,7 +70,6 @@ class Prog
 		
 		friend istream& operator>> (ifstream&, Prog&);
 		
-		//vector<Command*> it;
 		void run();
 };
 
@@ -121,7 +117,7 @@ class Repeat : public Command
 		
 	public:
 		Repeat();
-		Repeat(ifstream&, streampos, float);
+		Repeat(ifstream&, streampos, int);
 	
 		~Repeat();
 	
@@ -132,7 +128,8 @@ class Repeat : public Command
 Prog::Prog() { }
 
 
-Prog::Prog (ifstream &infile, streampos spos)
+/* Polymorphic constructor for Prog with default function parameters */
+Prog::Prog (ifstream &infile, streampos spos = ios::beg)
 {
 	sspos = spos;
 	createInstructionList(infile);
@@ -213,7 +210,7 @@ void Prog::createInstructionList (ifstream &infile)
 	}
 	
 	istringstream ss(input);
-	ss.seekg(sspos);
+	ss.seekg(sspos); // Go to position in input file from which instructions need to be processed
 			
 	string word, word2;
 	float v = 0;
@@ -259,15 +256,13 @@ void Prog::createInstructionList (ifstream &infile)
 		{
 			ss >> word; 
 			v = getCommandValue(word);
-			tempCommand = new Repeat(infile, ss.tellg(), v);
+			tempCommand = new Repeat(infile, ss.tellg(), (int)v);
 			instructions.push_back(tempCommand);
 		}
-		
-		/*if (word.find("]") != string::npos)
+		else if (word == "]")
 		{
-			tempCommand = new Repeat((int)-1);
-			instructions.push_back(tempCommand);
-		}*/
+			// Do nothing, discard and iterate to next word
+		}
 	}
 }
 
@@ -349,8 +344,9 @@ void Rotate::run()
 Repeat::Repeat():Command() { }
 
 
-Repeat::Repeat(ifstream &infile, streampos spos, float v):Command(v)
+Repeat::Repeat(ifstream &infile, streampos spos, int v)
 {
+	value = v;
 	subset = new Prog(infile, spos);
 }
 
@@ -381,13 +377,23 @@ void draw()
 int main (int argc, char** argv)   // Main function for program
 {
 	// Check whether filename has been passed as a command-line argument
-	if (!(argc > 1)) 
+	if (argc != 2) 
 	{
     		cout << "Usage: " << argv[0] << " filename" << endl ;
     		exit(0) ; 
  	}
  	
- 	ifstream in(argv[1], ios::binary);
+ 	ifstream in;
+ 	in.exceptions(ifstream::failbit | ifstream::badbit);
+ 	
+ 	try
+ 	{
+ 		in.open(argv[1], ios::binary);
+ 	}
+ 	catch (ifstream::failure e)
+ 	{
+ 		cout << "Exception opening / reading file." << endl;
+ 	}
  	in >> p; // Call overloaded operator to read input file
  	in.close();
  	
@@ -395,4 +401,5 @@ int main (int argc, char** argv)   // Main function for program
 	
 	return 0;
 }
+
 
