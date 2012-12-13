@@ -17,6 +17,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <iterator>
 #include <algorithm>
 
 
@@ -55,20 +56,24 @@ class Prog
 {
 	private:
 		vector<Command*> instructions;
+		//string input;
+		streampos sspos = ios::beg;
 			
-		inline string StringToUpper(string);
+		inline string StringToUpper (string);
 		
-		void createInstructionList(ifstream&);
-		float getCommandValue(string);
+		//string readFile();
+		void createInstructionList (ifstream&);
+		float getCommandValue (string);
 		
 	public:		
 		Prog();
-		Prog (ifstream&);
+		Prog (ifstream&, streampos);
 		
 		~Prog();
 		
 		friend istream& operator>> (ifstream&, Prog&);
 		
+		//vector<Command*> it;
 		void run();
 };
 
@@ -80,7 +85,7 @@ class Forward : public Command
 		Forward(float);
 	
 		~Forward();
-	
+		
 		void run();
 };
 
@@ -109,25 +114,27 @@ class Rotate : public Command
 };
 
 
-/*class Repeat : public Command
+class Repeat : public Command
 {
 	private:
 		Prog *subset;
+		
 	public:
 		Repeat();
-		Repeat(ifstream &infile, float value);
+		Repeat(ifstream&, streampos, float);
 	
 		~Repeat();
 	
 		void run();
-};*/
+};
 
 
 Prog::Prog() { }
 
 
-Prog::Prog (ifstream &infile)
+Prog::Prog (ifstream &infile, streampos spos)
 {
+	sspos = spos;
 	createInstructionList(infile);
 }
 
@@ -152,7 +159,7 @@ istream& operator>> (ifstream &in, Prog &p)
 for each command encountered in list. */
 void Prog::run()
 {
-    for (std::vector<Command*>::const_iterator it(instructions.begin()); it != instructions.end(); it++)
+    for (vector<Command*>::const_iterator it = instructions.begin(); it != instructions.end(); it++)
     {
         (*it)->run();
     }
@@ -188,7 +195,9 @@ float Prog::getCommandValue(string word2)
 	return v;
 }
 
-void Prog::createInstructionList(ifstream &infile)
+
+/* Create queue of instruction by reading in instructions file. */
+void Prog::createInstructionList (ifstream &infile)
 {
 	string input;
 	
@@ -204,6 +213,8 @@ void Prog::createInstructionList(ifstream &infile)
 	}
 	
 	istringstream ss(input);
+	ss.seekg(sspos);
+			
 	string word, word2;
 	float v = 0;
 	Command* tempCommand;
@@ -244,15 +255,15 @@ void Prog::createInstructionList(ifstream &infile)
 			tempCommand = new Jump(v);
 			instructions.push_back(tempCommand);
 		}
-		/*else if (word.find("REPEAT") != string::npos)
+		else if (word.find("REPEAT") != string::npos)
 		{
-			ss >> word;
+			ss >> word; 
 			v = getCommandValue(word);
-			tempCommand = new Repeat((int)v);
+			tempCommand = new Repeat(infile, ss.tellg(), v);
 			instructions.push_back(tempCommand);
 		}
 		
-		if (word.find("]") != string::npos)
+		/*if (word.find("]") != string::npos)
 		{
 			tempCommand = new Repeat((int)-1);
 			instructions.push_back(tempCommand);
@@ -332,6 +343,28 @@ void Rotate::run()
 	// adding positive / negative sign while
 	// parsing input file in Prog::createInstructionList()
 	glRotatef(value, 0, 0, 1);
+}
+
+
+Repeat::Repeat():Command() { }
+
+
+Repeat::Repeat(ifstream &infile, streampos spos, float v):Command(v)
+{
+	subset = new Prog(infile, spos);
+}
+
+
+Repeat::~Repeat()
+{
+	delete [] (subset);
+}
+
+
+void Repeat::run()
+{
+	for (int i = 0; i < value; i++)
+		subset->run();
 }
 
 
