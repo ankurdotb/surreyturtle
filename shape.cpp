@@ -114,6 +114,7 @@ class Repeat : public Command
 {
 	private:
 		Prog *subset;
+		int value;
 		
 	public:
 		Repeat();
@@ -157,9 +158,7 @@ for each command encountered in list. */
 void Prog::run()
 {
     for (vector<Command*>::const_iterator it = instructions.begin(); it != instructions.end(); it++)
-    {
-        (*it)->run();
-    }
+	(*it)->run();
 }
 
 
@@ -218,50 +217,70 @@ void Prog::createInstructionList (ifstream &infile)
 
 	while (ss >> word) // Read word-by-word into stringsteam object
 	{
-		// Command name can be in any case, converting to upper
-		word = StringToUpper(word); 
-		if (word == "[")
+		try
 		{
-			// Do nothing, discard and iterate to next word
+			// Command name can be in any case, converting to upper
+			word = StringToUpper(word); 
+			if (word == "[")
+			{
+				// Do nothing, discard and iterate to next word
+			}
+			else if (word.find("FORWARD") != string::npos)
+			{
+				ss >> word;
+				v = getCommandValue(word);
+				tempCommand = new Forward(v);
+				instructions.push_back(tempCommand);
+			}
+			else if (word.find("LEFT") != string::npos)
+			{
+				ss >> word;
+				v = getCommandValue(word);
+				tempCommand = new Rotate(v);
+				instructions.push_back(tempCommand);
+			}
+			else if (word.find("RIGHT") != string::npos)
+			{
+				ss >> word;
+				v = -1 * getCommandValue(word);
+				tempCommand = new Rotate(v);
+				instructions.push_back(tempCommand);
+			}
+			else if (word.find("JUMP") != string::npos)
+			{
+				ss >> word;
+				v = getCommandValue(word);
+				tempCommand = new Jump(v);
+				instructions.push_back(tempCommand);
+			}
+			else if (word.find("REPEAT") != string::npos)
+			{
+				ss >> word; 
+				v = getCommandValue(word);
+				tempCommand = new Repeat(infile, ss.tellg(), (int)v);
+				instructions.push_back(tempCommand);
+			}
+			else if (word == "]")
+			{
+				// Do nothing, discard and iterate to next word
+			}
+			else
+			{
+				string errMsg = "Unknown command encountered in instruction file.";
+				throw errMsg;
+			}
 		}
-		else if (word.find("FORWARD") != string::npos)
+		catch (bad_alloc&)
 		{
-			ss >> word;
-			v = getCommandValue(word);
-			tempCommand = new Forward(v);
-			instructions.push_back(tempCommand);
+			cout << "Error allocating memory while trying to create instruction queue." << endl;
 		}
-		else if (word.find("LEFT") != string::npos)
+		catch (string errMsg)
 		{
-			ss >> word;
-			v = getCommandValue(word);
-			tempCommand = new Rotate(v);
-			instructions.push_back(tempCommand);
+			cout << errMsg << endl;
 		}
-		else if (word.find("RIGHT") != string::npos)
+		catch (...)
 		{
-			ss >> word;
-			v = -1 * getCommandValue(word);
-			tempCommand = new Rotate(v);
-			instructions.push_back(tempCommand);
-		}
-		else if (word.find("JUMP") != string::npos)
-		{
-			ss >> word;
-			v = getCommandValue(word);
-			tempCommand = new Jump(v);
-			instructions.push_back(tempCommand);
-		}
-		else if (word.find("REPEAT") != string::npos)
-		{
-			ss >> word; 
-			v = getCommandValue(word);
-			tempCommand = new Repeat(infile, ss.tellg(), (int)v);
-			instructions.push_back(tempCommand);
-		}
-		else if (word == "]")
-		{
-			// Do nothing, discard and iterate to next word
+			cout << "Unexpected error occured." << endl;
 		}
 	}
 }
